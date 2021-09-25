@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+docker-compose exec app /usr/local/bin/python api/scrapper.py
