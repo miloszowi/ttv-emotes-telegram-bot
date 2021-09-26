@@ -1,4 +1,3 @@
-import logging
 from typing import Optional
 from uuid import uuid4
 
@@ -16,7 +15,6 @@ from handler.abstractHandler import AbstractHandler
 class EmoteInlineQueryHandler(AbstractHandler):
     botHandler: InlineQueryHandler
     emoteRepository: Emote
-    logger: logging.Logger
 
     def __init__(self) -> None:
         self.botHandler = InlineQueryHandler(self.handle)
