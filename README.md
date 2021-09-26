@@ -65,3 +65,5 @@ Tag the bot with `@ttv_emotes_bot` and then your emote code, bot will handle you
 
 ### Example
 ![example bot usage](docs/example.png)
+
+You don't need to finish your emote code, bot will try to match your already given expression to existing emotes.

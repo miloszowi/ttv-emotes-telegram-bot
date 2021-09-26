@@ -21,8 +21,8 @@ class Client():
         self.mongoClient = MongoClient(uri)
         self.database = self.mongoClient[MONGODB_DATABASE]
 
-    def findMany(self, collection: str, filter: dict) -> dict:
-        return self.database.get_collection(collection).find(filter)
+    def findMany(self, collection: str, filter: dict, limit: int = 8) -> dict:
+        return self.database.get_collection(collection).find(filter).limit(limit)
 
     def insertMany(self, collection: str, data: Iterable[dict]) -> None:
         self.database.get_collection(collection).insert_many(data)

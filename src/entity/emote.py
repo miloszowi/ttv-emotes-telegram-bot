@@ -12,6 +12,8 @@ class Emote():
     codeIndex: str = 'code'
     typeIndex: str = 'type' 
 
+    sourceInterpolationString: str = 'https://cdn.betterttv.net/emote/{}/3x'
+
     def __init__(self, ttvId: str, code: str, type: str) -> None:
         self.ttvId = ttvId
         self.code = code
@@ -25,6 +27,9 @@ class Emote():
 
     def getType(self) -> str:
         return self.type
+
+    def getSource(self) -> str:
+        return self.sourceInterpolationString.format(self.getTtvId())
 
     @staticmethod
     def fromMongoDocument(mongoDocument: dict) -> Emote:

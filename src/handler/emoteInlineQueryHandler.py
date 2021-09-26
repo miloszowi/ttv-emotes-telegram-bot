@@ -1,14 +1,13 @@
+import logging
 from typing import Optional
-import uuid
-from logging import raiseExceptions
-
-from telegram.inline.inlinequeryresult import InlineQueryResult
+from uuid import uuid4
 
 from entity.emote import Emote
 from repository.emoteRepository import EmoteRepository
 from telegram import InlineQueryResultGif, InlineQueryResultPhoto
 from telegram.ext.callbackcontext import CallbackContext
 from telegram.ext.inlinequeryhandler import InlineQueryHandler
+from telegram.inline.inlinequeryresult import InlineQueryResult
 from telegram.update import Update
 
 from handler.abstractHandler import AbstractHandler
@@ -17,30 +16,30 @@ from handler.abstractHandler import AbstractHandler
 class EmoteInlineQueryHandler(AbstractHandler):
     botHandler: InlineQueryHandler
     emoteRepository: Emote
+    logger: logging.Logger
 
     def __init__(self) -> None:
         self.botHandler = InlineQueryHandler(self.handle)
         self.emoteRepository = EmoteRepository()
 
     def handle(self, update: Update, context: CallbackContext) -> None:
-        emotes = self.emoteRepository.getManyByCode(update.inline_query.query.lower())
+        emotes = self.emoteRepository.searchByCode(update.inline_query.query.lower())
 
-        possibleEmotes = []
-        for idx, emote in enumerate(emotes):
-            possibleEmotes.append(
-                self.resolveEmote(emote, idx)
-            )
-        
-        update.inline_query.answer(possibleEmotes, cache_time=5)
+        update.inline_query.answer(
+            [self.resolveEmote(emote) for emote in emotes],
+            cache_time = 10
+        )
 
     def getBotHandler(self) -> InlineQueryHandler:
         return self.botHandler
 
-    def resolveEmote(self, emote: Emote, idx: int) -> Optional[InlineQueryResult]:
-        emoteUrl = f'https://cdn.betterttv.net/emote/{emote.getTtvId()}/3x'
+    def resolveEmote(self, emote: Emote) -> Optional[InlineQueryResult]:
+        emoteUrl = emote.getSource()
+        emoteTempId = uuid4()
 
         scenarios = {
-            'gif' : InlineQueryResultGif(id=idx, gif_url=emoteUrl, thumb_url=emoteUrl),
-            'png' : InlineQueryResultPhoto(id=idx, photo_url=emoteUrl, thumb_url=emoteUrl)
+            'gif' : InlineQueryResultGif(emoteTempId, emoteUrl, emoteUrl),
+            'png' : InlineQueryResultPhoto(emoteTempId, emoteUrl, emoteUrl)
         }
+
         return scenarios.get(emote.getType(), None)

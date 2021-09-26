@@ -3,19 +3,18 @@ from database.client import Client
 from entity.emote import Emote
 
 class EmoteRepository():
-    client: Client
+    databaseClient: Client
 
     def __init__(self) -> None:
-        self.client = Client()
+        self.databaseClient = Client()
 
-    def getManyByCode(self, code: str) -> Iterable[Emote]:
-        result = []
-        search = self.client.findMany(Emote.collection, {Emote.codeIndex: code})
+    def searchByCode(self, code: str) -> Iterable[Emote]:
+        search = self.databaseClient.findMany(
+            Emote.collection,
+            { Emote.codeIndex: {'$regex' : code} }
+        )
 
-        for item in search[:4]:
-            result.append(Emote.fromMongoDocument(item))
-
-        return result
+        return [Emote.fromMongoDocument(item) for item in search]
 
     def insertMany(self, mongoData: dict) -> None:
-        self.client.insertMany(Emote.collection, mongoData)
+        self.databaseClient.insertMany(Emote.collection, mongoData)
